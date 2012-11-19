@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Nancy.Elmah</id>
+    <version>$version$</version>
+    <authors>Christian Westman</authors>
+    <owners>Christian Westman</owners>
+    <projectUrl>https://github.com/creamdog/Nancy.Elmah</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Integrated Elmah logging in Nancy</description>
+    <releaseNotes>initial release</releaseNotes>
+    <copyright>Copyright 2012</copyright>
+    <tags>nancy elmah logging</tags>
+    <dependencies>
+      <dependency id="Nancy" version="0.13.0" />
+      <dependency id="Elmah" version="1.22.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\Nancy.Elmah.dll" target="lib\net40"/>
+  </files>
+</package>
