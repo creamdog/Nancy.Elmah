@@ -1,6 +1,6 @@
 ﻿namespace Nancy.Elmah.Asp.Net.Example
 {
-    public class Bootstrapper : Nancy.DefaultNancyBootstrapper
+    public class Bootstrapper : DefaultNancyBootstrapper
     {
         protected override void ApplicationStartup(TinyIoc.TinyIoCContainer container, Nancy.Bootstrapper.IPipelines pipelines)
         {
