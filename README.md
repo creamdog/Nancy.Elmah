@@ -37,7 +37,7 @@ namespace Nancy.Elmah.Asp.Net.Example
 ####Basic logging with secured Elmah interface
 - Add the following to your bootstrapper to log all uncaught exceptions with elmah. 
 - Elmah will log all uncaught exceptions.
-- You can browse the Elmah error log at http://yoursite/elmah.
+- If you are logged in with the claim "administrator" you can browse the Elmah error log at http://yoursite/elmah.
 
 ```c#
 namespace Nancy.Elmah.Asp.Net.Example
