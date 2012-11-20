@@ -5,6 +5,7 @@ using System.Web;
 using Elmah;
 using Nancy.Bootstrapper;
 using Nancy.Security;
+using ErrorSignal = Elmah.ErrorSignal;
 
 namespace Nancy.Elmah
 {
@@ -91,7 +92,9 @@ namespace Nancy.Elmah
 
         public static Response LogError(NancyContext context, Exception exception)
         {
-            ErrorLog.GetDefault(HttpContext.Current).Log(new Error(exception));
+            ErrorSignal.FromCurrentContext().Raise(exception);
+
+            //ErrorLog.GetDefault(HttpContext.Current).Log(new Error(exception){});
             return null;
         }
 
