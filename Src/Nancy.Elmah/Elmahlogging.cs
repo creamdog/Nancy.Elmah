@@ -14,8 +14,8 @@ namespace Nancy.Elmah
     /// </summary>
     public class Elmahlogging : NancyModule
     {
-        private static string _elmahPath;
-        private static string[] _requiredClaims;
+        private static string _elmahPath = string.Empty;
+        private static string[] _requiredClaims = new string[0];
         private static HttpStatusCode[] _loggedHttpStatusCodes;
 
         /// <summary>
@@ -93,8 +93,6 @@ namespace Nancy.Elmah
         public static Response LogError(NancyContext context, Exception exception)
         {
             ErrorSignal.FromCurrentContext().Raise(exception);
-
-            //ErrorLog.GetDefault(HttpContext.Current).Log(new Error(exception){});
             return null;
         }
 
@@ -133,13 +131,10 @@ namespace Nancy.Elmah
 
                 Get["/{resource}"] = args =>
                 {
-
                     var q = (Request.Query as DynamicDictionary).Keys.ToDictionary(key => key.Replace("?", ""), key => (string)(Request.Query as DynamicDictionary)[key]);
                     q["get"] = (string) args.resource;
-
                     var queryString = "?"+string.Join("&", q.Select(kv => string.Format("{0}={1}", kv.Key, kv.Value)));
-
-                    return Response.AsRedirect("/" + _elmahPath + "/" + queryString);
+                    return Response.AsRedirect("/" + _elmahPath + queryString);
                 };
             }
         }
