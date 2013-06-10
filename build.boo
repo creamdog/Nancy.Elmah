@@ -1,6 +1,6 @@
 solution_file = "Nancy.Elmah.sln"
 configuration = "release"
-nextVersion = "0.1.5"
+nextVersion = "0.1.6"
 
 target default, (updateVersion, compile, nuget):
 	pass

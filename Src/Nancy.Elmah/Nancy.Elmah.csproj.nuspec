@@ -8,11 +8,11 @@
     <projectUrl>https://github.com/creamdog/Nancy.Elmah</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Integrated Elmah logging in Nancy</description>
-    <releaseNotes>initial release</releaseNotes>
+    <releaseNotes>now targets Nancy >= 0.17.1</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <tags>nancy elmah logging</tags>
     <dependencies>
-      <dependency id="Nancy" version="0.16.1.0" />
+      <dependency id="Nancy" version="0.17.1" />
       <dependency id="Elmah" version="1.2.2" />
     </dependencies>
   </metadata>
