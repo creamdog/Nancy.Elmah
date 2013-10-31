@@ -134,7 +134,7 @@ namespace Nancy.Elmah
                     var q = (Request.Query as DynamicDictionary).Keys.ToDictionary(key => key.Replace("?", ""), key => (string)(Request.Query as DynamicDictionary)[key]);
                     q["get"] = (string) args.resource;
                     var queryString = "?"+string.Join("&", q.Select(kv => string.Format("{0}={1}", kv.Key, kv.Value)));
-                    return Response.AsRedirect("/" + _elmahPath +"/"+ queryString);
+                    return Response.AsRedirect("./"+ queryString);
                 };
             }
         }
