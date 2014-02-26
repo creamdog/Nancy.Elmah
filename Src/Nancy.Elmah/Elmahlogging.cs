@@ -26,7 +26,7 @@ namespace Nancy.Elmah
         {
             _loggedHttpStatusCodes = new HttpStatusCode[0];
             _requiredClaims = new string[0];
-            _elmahPath = elmahModuleBasePath;
+            _elmahPath = AppendSlash(elmahModuleBasePath);
             pipelines.OnError.AddItemToEndOfPipeline(LogError);
             pipelines.AfterRequest.AddItemToEndOfPipeline(LogHttpStatusCode);
         }
@@ -44,7 +44,7 @@ namespace Nancy.Elmah
         {
             _loggedHttpStatusCodes = new HttpStatusCode[0];
             _requiredClaims = requiredClaims.ToArray();
-            _elmahPath = elmahModuleBasePath;
+            _elmahPath = AppendSlash(elmahModuleBasePath);
             pipelines.OnError.AddItemToEndOfPipeline(LogError);
             pipelines.AfterRequest.AddItemToEndOfPipeline(LogHttpStatusCode);
         }
@@ -63,7 +63,7 @@ namespace Nancy.Elmah
         {
             _loggedHttpStatusCodes = loggedHttpStatusCodes.ToArray();
             _requiredClaims = requiredClaims.ToArray();
-            _elmahPath = elmahModuleBasePath;
+            _elmahPath = AppendSlash(elmahModuleBasePath);
             pipelines.OnError.AddItemToEndOfPipeline(LogError);
             pipelines.AfterRequest.AddItemToEndOfPipeline(LogHttpStatusCode);
         }
@@ -128,9 +128,14 @@ namespace Nancy.Elmah
                 query["get"] = (string)args.resource;
                 var queryString = string.Join("&", query.Select(kv => kv.Key.Replace("?", "") + "=" + kv.Value));
                 // Need trailing / for some elmah pages to work
-                var location = string.Format("{0}{1}?{2}", _elmahPath, _elmahPath.EndsWith("/") ? "" : "/", queryString);
+                var location = _elmahPath + "?" + queryString;
                 return Response.AsRedirect(location);
             };
+        }
+
+        private static string AppendSlash(string path)
+        {
+            return path.EndsWith("/") ? path : path + "/";
         }
     }
 }
