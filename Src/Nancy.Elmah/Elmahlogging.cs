@@ -94,43 +94,41 @@ namespace Nancy.Elmah
 
         public Elmahlogging() : base(_elmahPath)
         {
+            if (string.IsNullOrEmpty(_elmahPath)) return;
             if (_requiredClaims.Length > 0) this.RequiresClaims(_requiredClaims);
-
-            if (!string.IsNullOrEmpty(_elmahPath))
+            
+            Get["/"] = args =>
             {
-                Get["/"] = args =>
+                switch ((string)Request.Query.get.Value)
                 {
-                    switch ((string)Request.Query.get.Value)
-                    {
-                        case "stylesheet":
-                            return Response.AsElmahEmbeddedResource("ErrorLog.css", "text/css").WithContentType("text/css;charset=UTF-8");
-                        case "about":
-                            return Response.AsElmahEmbeddedPage("AboutPage");
-                        case "detail":
-                            return Response.AsElmahEmbeddedPage("ErrorDetailPage");
-                        case "xml":
-                            return Response.AsElmahEmbeddedPage("ErrorXmlHandler").WithContentType("text/xml;charset=UTF-8");
-                        case "json":
-                            return Response.AsElmahEmbeddedPage("ErrorJsonHandler").WithContentType("application/json;charset=UTF-8");
-                        case "digestrss":
-                            return Response.AsElmahEmbeddedPage("ErrorDigestRssHandler").WithContentType("application/rss+xml;charset=UTF-8");
-                        case "rss":
-                            return Response.AsElmahEmbeddedPage("ErrorRssHandler").WithContentType("application/rss+xml;charset=UTF-8");
-                        case "download":
-                            return Response.AsElmahEmbeddedPage("ErrorLogDownloadHandler").WithContentType("application/rss+xml;charset=UTF-8");
-                        default:
-                            return Response.AsElmahEmbeddedPage("ErrorLogPage");
-                    }
-                };
+                    case "stylesheet":
+                        return Response.AsElmahEmbeddedResource("ErrorLog.css", "text/css").WithContentType("text/css;charset=UTF-8");
+                    case "about":
+                        return Response.AsElmahEmbeddedPage("AboutPage");
+                    case "detail":
+                        return Response.AsElmahEmbeddedPage("ErrorDetailPage");
+                    case "xml":
+                        return Response.AsElmahEmbeddedPage("ErrorXmlHandler").WithContentType("text/xml;charset=UTF-8");
+                    case "json":
+                        return Response.AsElmahEmbeddedPage("ErrorJsonHandler").WithContentType("application/json;charset=UTF-8");
+                    case "digestrss":
+                        return Response.AsElmahEmbeddedPage("ErrorDigestRssHandler").WithContentType("application/rss+xml;charset=UTF-8");
+                    case "rss":
+                        return Response.AsElmahEmbeddedPage("ErrorRssHandler").WithContentType("application/rss+xml;charset=UTF-8");
+                    case "download":
+                        return Response.AsElmahEmbeddedPage("ErrorLogDownloadHandler").WithContentType("application/rss+xml;charset=UTF-8");
+                    default:
+                        return Response.AsElmahEmbeddedPage("ErrorLogPage");
+                }
+            };
 
-                Get["/{resource}"] = args =>
-                {
-                    var query = Request.Query as IDictionary<string, object>;
-                    query["get"] = (string)args.resource;
-                    var queryString = string.Join("&", query.Select(kv => string.Format("{0}={1}", kv.Key.Replace("?", ""), kv.Value)));
-                    return Response.AsRedirect(_elmahPath + "/?" + queryString);
-                };
-            }
+            Get["/{resource}"] = args =>
+            {
+                var query = (IDictionary<string, object>)Request.Query;
+                query["get"] = (string)args.resource;
+                var queryString = string.Join("&", query.Select(kv => kv.Key.Replace("?", "") + "=" + kv.Value));
+                return Response.AsRedirect(_elmahPath + "?" + queryString);
+            };
         }
     }
 }

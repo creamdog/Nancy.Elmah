@@ -17,8 +17,8 @@ namespace Nancy.Elmah
 
             var page = Activator.CreateInstance(type, name, contentType, Encoding.GetEncoding("Windows-1252")) as IHttpHandler;
             if (page == null) return HttpStatusCode.NotFound;
-
             page.ProcessRequest(HttpContext.Current);
+
             return new Response().WithContentType("text/css;charset=UTF-8");
         }
 
@@ -31,8 +31,8 @@ namespace Nancy.Elmah
 
             var page = Activator.CreateInstance(type) as IHttpHandler;
             if (page == null) return HttpStatusCode.NotFound;
-            
             page.ProcessRequest(HttpContext.Current);
+
             return new Response().WithContentType("text/html;charset=UTF-8").WithStatusCode(HttpStatusCode.OK);
         }
     }
