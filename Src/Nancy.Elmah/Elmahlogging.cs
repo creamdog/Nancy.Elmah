@@ -127,7 +127,9 @@ namespace Nancy.Elmah
                 var query = (IDictionary<string, object>)Request.Query;
                 query["get"] = (string)args.resource;
                 var queryString = string.Join("&", query.Select(kv => kv.Key.Replace("?", "") + "=" + kv.Value));
-                return Response.AsRedirect(_elmahPath + "?" + queryString);
+                // Need trailing / for some elmah pages to work
+                var location = string.Format("{0}{1}?{2}", _elmahPath, _elmahPath.EndsWith("/") ? "" : "/", queryString);
+                return Response.AsRedirect(location);
             };
         }
     }
