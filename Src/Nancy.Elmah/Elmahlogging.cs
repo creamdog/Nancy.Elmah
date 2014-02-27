@@ -95,7 +95,7 @@ namespace Nancy.Elmah
             {
                 var query = (IDictionary<string, object>)Request.Query;
                 query["get"] = (string)args.resource;
-                var queryString = string.Join("&", query.Select(kv => kv.Key.Replace("?", "") + "=" + kv.Value));
+                var queryString = string.Join("&", query.Select(kv => kv.Key + "=" + kv.Value));
                 var location = "~" +_elmahPath + "/?" + queryString;
                 return Response.AsRedirect(location);
             };
