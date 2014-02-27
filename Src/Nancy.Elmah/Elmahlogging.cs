@@ -16,41 +16,6 @@ namespace Nancy.Elmah
 
         /// <summary>
         /// Enables Elmah logging of application exceptions and errors.
-        /// Using this enabled will catch and log exceptions only.
-        /// The Elmah admin interface at the path defined by <param name="elmahModuleBasePath">elmahModuleBasePath</param> 
-        /// will be public and visible to anybody
-        /// </summary>
-        /// <param name="pipelines"></param>
-        /// <param name="elmahModuleBasePath"></param>
-        public static void Enable(IPipelines pipelines, string elmahModuleBasePath)
-        {
-            _loggedHttpStatusCodes = new HttpStatusCode[0];
-            _requiredClaims = new string[0];
-            _elmahPath = AppendSlash(elmahModuleBasePath);
-            pipelines.OnError.AddItemToEndOfPipeline(LogError);
-            pipelines.AfterRequest.AddItemToEndOfPipeline(LogHttpStatusCode);
-        }
-
-        /// <summary>
-        /// Enables Elmah logging of application exceptions and errors.
-        /// Using this enabled will catch and log exceptions only.
-        /// The Elmah admin interface at the path defined by <param name="elmahModuleBasePath">elmahModuleBasePath</param> 
-        /// will be visible to users that has the claims specified by <param name="requiredClaims">requiredClaims</param>
-        /// </summary>
-        /// <param name="pipelines"></param>
-        /// <param name="elmahModuleBasePath"></param>
-        /// <param name="requiredClaims"></param>
-        public static void Enable(IPipelines pipelines, string elmahModuleBasePath, IEnumerable<string> requiredClaims)
-        {
-            _loggedHttpStatusCodes = new HttpStatusCode[0];
-            _requiredClaims = requiredClaims.ToArray();
-            _elmahPath = AppendSlash(elmahModuleBasePath);
-            pipelines.OnError.AddItemToEndOfPipeline(LogError);
-            pipelines.AfterRequest.AddItemToEndOfPipeline(LogHttpStatusCode);
-        }
-
-        /// <summary>
-        /// Enables Elmah logging of application exceptions and errors.
         /// Using this enabled will catch and log exceptions and HttpStatusCodes defined by <param name="loggedHttpStatusCodes">loggedHttpStatusCodes</param>.
         /// The Elmah admin interface at the path defined by <param name="elmahModuleBasePath">elmahModuleBasePath</param> 
         /// will be visible to users that has the claims specified by <param name="requiredClaims">requiredClaims</param>.
@@ -59,11 +24,15 @@ namespace Nancy.Elmah
         /// <param name="elmahModuleBasePath"></param>
         /// <param name="requiredClaims"></param>
         /// <param name="loggedHttpStatusCodes"></param>
-        public static void Enable(IPipelines pipelines, string elmahModuleBasePath, IEnumerable<string> requiredClaims, IEnumerable<HttpStatusCode> loggedHttpStatusCodes)
+        public static void Enable(IPipelines pipelines, string elmahModuleBasePath, IEnumerable<string> requiredClaims = null, IEnumerable<HttpStatusCode> loggedHttpStatusCodes = null)
         {
-            _loggedHttpStatusCodes = loggedHttpStatusCodes.ToArray();
-            _requiredClaims = requiredClaims.ToArray();
-            _elmahPath = AppendSlash(elmahModuleBasePath);
+            if (pipelines == null) throw new ArgumentNullException("pipelines");
+            if (string.IsNullOrWhiteSpace(elmahModuleBasePath)) throw new ArgumentNullException("elmahModuleBasePath");
+
+            _elmahPath = ("/" + elmahModuleBasePath + "/").Replace("//", "/"); // yes, really need leading and trailing slash.
+            _requiredClaims = (requiredClaims == null) ? new string[0] : requiredClaims.ToArray();
+            _loggedHttpStatusCodes = (loggedHttpStatusCodes == null) ? new[] { HttpStatusCode.NotFound } : loggedHttpStatusCodes.ToArray();
+            
             pipelines.OnError.AddItemToEndOfPipeline(LogError);
             pipelines.AfterRequest.AddItemToEndOfPipeline(LogHttpStatusCode);
         }
@@ -73,13 +42,13 @@ namespace Nancy.Elmah
             if (context == null || context.Response == null) return;
             if (_loggedHttpStatusCodes.Contains(context.Response.StatusCode) == false) return;
 
-            var url = context.Request == null ? string.Empty : context.Request.Url.ToString();
-            var statusCode = context.Response == null ? string.Empty : context.Response.StatusCode.ToString();
-            var nancyModuleName = context.NegotiationContext == null ? string.Empty : context.NegotiationContext.ModuleName;
-            var nancyModulePath = context.NegotiationContext == null ? string.Empty : context.NegotiationContext.ModulePath;
-            var user = context.CurrentUser == null ? string.Empty : context.CurrentUser.UserName;
+            var url = (context.Request == null) ? string.Empty : context.Request.Url.ToString();
+            var statusCode = (context.Response == null) ? string.Empty : context.Response.StatusCode.ToString();
+            var nancyModuleName = (context.NegotiationContext == null) ? string.Empty : context.NegotiationContext.ModuleName;
+            var nancyModulePath = (context.NegotiationContext == null) ? string.Empty : context.NegotiationContext.ModulePath;
+            var user = (context.CurrentUser == null) ? string.Empty : context.CurrentUser.UserName;
 
-            var message = string.Format("url: {0}, statuscode: {1}, user: {2}, moduleName: {3}, modulePath: {4}", 
+            var message = string.Format("url: {0}, statuscode: {1}, user: {2}, moduleName: {3}, modulePath: {4}",
                 url, statusCode, user, nancyModuleName, nancyModulePath);
 
             var exception = new HttpException((int)context.Response.StatusCode, message);
@@ -95,8 +64,8 @@ namespace Nancy.Elmah
         public Elmahlogging() : base(_elmahPath)
         {
             if (string.IsNullOrEmpty(_elmahPath)) return;
-            if (_requiredClaims.Length > 0) this.RequiresClaims(_requiredClaims);
-            
+            if (_requiredClaims != null && _requiredClaims.Length > 0) this.RequiresClaims(_requiredClaims);
+
             Get["/"] = args =>
             {
                 switch ((string)Request.Query.get.Value)
@@ -127,14 +96,9 @@ namespace Nancy.Elmah
                 var query = (IDictionary<string, object>)Request.Query;
                 query["get"] = (string)args.resource;
                 var queryString = string.Join("&", query.Select(kv => kv.Key.Replace("?", "") + "=" + kv.Value));
-                var location = _elmahPath + "?" + queryString;
+                var location = "~" +_elmahPath + "?" + queryString;
                 return Response.AsRedirect(location);
             };
-        }
-
-        private static string AppendSlash(string path)
-        {
-            return path.EndsWith("/") ? path : path + "/";
         }
     }
 }
