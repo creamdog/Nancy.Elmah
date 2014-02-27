@@ -31,7 +31,7 @@ namespace Nancy.Elmah
 
             _elmahPath = elmahModuleBasePath.StartsWith("/") ? elmahModuleBasePath : "/" + elmahModuleBasePath;
             _requiredClaims = (requiredClaims == null) ? new string[0] : requiredClaims.ToArray();
-            _loggedHttpStatusCodes = (loggedHttpStatusCodes == null) ? new[] { HttpStatusCode.NotFound } : loggedHttpStatusCodes.ToArray();
+            _loggedHttpStatusCodes = (loggedHttpStatusCodes == null) ? new HttpStatusCode[0] : loggedHttpStatusCodes.ToArray();
             
             pipelines.OnError.AddItemToEndOfPipeline(LogError);
             pipelines.AfterRequest.AddItemToEndOfPipeline(LogHttpStatusCode);
