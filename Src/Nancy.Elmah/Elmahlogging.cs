@@ -29,7 +29,7 @@ namespace Nancy.Elmah
             if (pipelines == null) throw new ArgumentNullException("pipelines");
             if (string.IsNullOrWhiteSpace(elmahModuleBasePath)) throw new ArgumentNullException("elmahModuleBasePath");
 
-            _elmahPath = ("/" + elmahModuleBasePath + "/").Replace("//", "/"); // yes, really need leading and trailing slash.
+            _elmahPath = elmahModuleBasePath.StartsWith("/") ? elmahModuleBasePath : "/" + elmahModuleBasePath;
             _requiredClaims = (requiredClaims == null) ? new string[0] : requiredClaims.ToArray();
             _loggedHttpStatusCodes = (loggedHttpStatusCodes == null) ? new[] { HttpStatusCode.NotFound } : loggedHttpStatusCodes.ToArray();
             
@@ -96,7 +96,7 @@ namespace Nancy.Elmah
                 var query = (IDictionary<string, object>)Request.Query;
                 query["get"] = (string)args.resource;
                 var queryString = string.Join("&", query.Select(kv => kv.Key.Replace("?", "") + "=" + kv.Value));
-                var location = "~" +_elmahPath + "?" + queryString;
+                var location = "~" +_elmahPath + "/?" + queryString;
                 return Response.AsRedirect(location);
             };
         }
